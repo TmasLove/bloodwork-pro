@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  passwordHash  String
+  role          String         @default("PATIENT") // PATIENT or DOCTOR
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  bloodWorks    BloodWork[]
+  protocols     Protocol[]     @relation("PatientProtocols")
+  reviews       DoctorReview[]
+  notifications Notification[]
+}
+
+model BloodWork {
+  id            String    @id @default(cuid())
+  userId        String
+  fileName      String
+  filePath      String
+  fileType      String    // "pdf" or "image"
+  extractedText String?
+  status        String    @default("UPLOADED") // UPLOADED, PROCESSING, ANALYZED, ERROR
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
+  protocol      Protocol?
+}
+
+model Protocol {
+  id          String        @id @default(cuid())
+  bloodWorkId String        @unique
+  patientId   String
+  content     String        // LLM-generated protocol (markdown)
+  summary     String?       // Brief summary
+  status      String        @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  bloodWork   BloodWork     @relation(fields: [bloodWorkId], references: [id])
+  patient     User          @relation("PatientProtocols", fields: [patientId], references: [id])
+  review      DoctorReview?
+}
+
+model DoctorReview {
+  id         String   @id @default(cuid())
+  protocolId String   @unique
+  doctorId   String
+  decision   String   // APPROVED or REJECTED
+  comments   String?
+  createdAt  DateTime @default(now())
+  protocol   Protocol @relation(fields: [protocolId], references: [id])
+  doctor     User     @relation(fields: [doctorId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
