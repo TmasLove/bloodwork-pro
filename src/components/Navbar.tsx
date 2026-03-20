@@ -11,6 +11,7 @@ import {
   Activity,
   User,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface UserData {
   id: string;
@@ -78,21 +79,29 @@ export default function Navbar() {
     user?.role === "DOCTOR" ? "/dashboard/doctor" : "/dashboard/patient";
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 glass-card border-b border-[var(--border)]/50 backdrop-blur-xl bg-[var(--background)]/60">
+      {/* Subtle gradient line at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--primary)]/40 to-transparent" />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <Link href={user ? dashboardLink : "/"} className="flex items-center gap-2">
-            <Activity className="h-6 w-6 text-[var(--primary)]" />
-            <span className="text-lg font-bold">BloodWork Pro</span>
+        <div className="flex h-18 items-center justify-between py-1">
+          <Link href={user ? dashboardLink : "/"} className="flex items-center gap-2.5 group">
+            <div className="relative">
+              <Activity className="h-7 w-7 text-[var(--primary)] transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute inset-0 h-7 w-7 text-[var(--primary)] blur-sm opacity-50" />
+            </div>
+            <span className="text-xl font-bold tracking-tight gradient-text">
+              BloodWork Pro
+            </span>
           </Link>
 
           {user ? (
             <>
               {/* Desktop nav */}
-              <div className="hidden items-center gap-4 md:flex">
+              <div className="hidden items-center gap-3 md:flex">
                 <Link
                   href={dashboardLink}
-                  className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-[var(--secondary)] transition"
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-[var(--foreground)]/80 hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/80 transition-all duration-200"
                 >
                   Dashboard
                 </Link>
@@ -101,62 +110,82 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative rounded-lg p-2 hover:bg-[var(--secondary)] transition"
+                    className="relative rounded-xl p-2.5 hover:bg-[var(--secondary)]/80 transition-all duration-200"
                   >
-                    <Bell className="h-5 w-5" />
+                    <Bell className="h-5 w-5 text-[var(--foreground)]/70" />
                     {unreadCount > 0 && (
-                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--danger)] text-xs text-white">
+                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--danger)] text-xs font-semibold text-white pulse-ring">
                         {unreadCount}
                       </span>
                     )}
                   </button>
 
-                  {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 rounded-xl border border-[var(--border)] bg-[var(--background)] shadow-lg">
-                      <div className="p-3 font-semibold border-b border-[var(--border)]">
-                        Notifications
-                      </div>
-                      <div className="max-h-64 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                          <p className="p-4 text-sm text-[var(--muted)]">
-                            No notifications
-                          </p>
-                        ) : (
-                          notifications.map((n) => (
-                            <div
-                              key={n.id}
-                              className={`cursor-pointer border-b border-[var(--border)] p-3 text-sm hover:bg-[var(--secondary)] transition ${
-                                !n.read ? "bg-blue-50 dark:bg-blue-950" : ""
-                              }`}
-                              onClick={() => {
-                                if (!n.read) markRead(n.id);
-                                if (n.link) router.push(n.link);
-                                setShowNotifications(false);
-                              }}
-                            >
-                              <p>{n.message}</p>
-                              <p className="mt-1 text-xs text-[var(--muted)]">
-                                {new Date(n.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {showNotifications && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right-0 mt-2 w-80 rounded-2xl border border-[var(--border)]/50 glass-card backdrop-blur-xl bg-[var(--background)]/80 shadow-2xl shadow-black/10 overflow-hidden"
+                      >
+                        <div className="p-4 font-semibold text-sm border-b border-[var(--border)]/50 flex items-center justify-between">
+                          <span>Notifications</span>
+                          {unreadCount > 0 && (
+                            <span className="text-xs font-medium rounded-full bg-[var(--primary)]/15 text-[var(--primary)] px-2.5 py-0.5">
+                              {unreadCount} new
+                            </span>
+                          )}
+                        </div>
+                        <div className="max-h-64 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <p className="p-5 text-sm text-[var(--muted)] text-center">
+                              No notifications
+                            </p>
+                          ) : (
+                            notifications.map((n) => (
+                              <div
+                                key={n.id}
+                                className={`cursor-pointer border-b border-[var(--border)]/30 p-3.5 text-sm hover:bg-[var(--secondary)]/60 transition-all duration-150 ${
+                                  !n.read ? "bg-[var(--primary)]/5" : ""
+                                }`}
+                                onClick={() => {
+                                  if (!n.read) markRead(n.id);
+                                  if (n.link) router.push(n.link);
+                                  setShowNotifications(false);
+                                }}
+                              >
+                                <div className="flex items-start gap-2.5">
+                                  {!n.read && (
+                                    <div className="mt-1.5 h-2 w-2 rounded-full bg-[var(--primary)] shrink-0" />
+                                  )}
+                                  <div className={!n.read ? "" : "pl-[18px]"}>
+                                    <p className="leading-snug">{n.message}</p>
+                                    <p className="mt-1.5 text-xs text-[var(--muted)]">
+                                      {new Date(n.createdAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2">
-                  <User className="h-4 w-4" />
+                <div className="flex items-center gap-2.5 rounded-xl bg-[var(--secondary)]/60 border border-[var(--border)]/30 px-3.5 py-2">
+                  <User className="h-4 w-4 text-[var(--foreground)]/60" />
                   <span className="text-sm font-medium">{user.name}</span>
-                  <span className="rounded bg-[var(--primary)] px-2 py-0.5 text-xs text-white">
+                  <span className="rounded-md bg-gradient-to-r from-[var(--primary)] to-[var(--primary)]/80 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
                     {user.role}
                   </span>
                 </div>
 
                 <button
                   onClick={handleLogout}
-                  className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--danger)] transition"
+                  className="rounded-xl p-2.5 text-[var(--muted)] hover:bg-[var(--danger)]/10 hover:text-[var(--danger)] transition-all duration-200"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
@@ -164,7 +193,7 @@ export default function Navbar() {
 
               {/* Mobile hamburger */}
               <button
-                className="md:hidden rounded-lg p-2"
+                className="md:hidden rounded-xl p-2.5 hover:bg-[var(--secondary)]/80 transition-all duration-200"
                 onClick={() => setMobileOpen(!mobileOpen)}
               >
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -174,13 +203,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-[var(--secondary)] transition"
+                className="rounded-xl px-4 py-2.5 text-sm font-medium text-[var(--foreground)]/80 hover:text-[var(--foreground)] hover:bg-[var(--secondary)]/80 transition-all duration-200"
               >
                 Log In
               </Link>
               <Link
                 href="/signup"
-                className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] transition"
+                className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-hover)] shadow-md shadow-[var(--primary)]/20 transition-all duration-200 hover:shadow-lg hover:shadow-[var(--primary)]/30"
               >
                 Sign Up
               </Link>
@@ -189,26 +218,40 @@ export default function Navbar() {
         </div>
 
         {/* Mobile menu */}
-        {mobileOpen && user && (
-          <div className="border-t border-[var(--border)] pb-4 pt-2 md:hidden">
-            <Link
-              href={dashboardLink}
-              className="block rounded-lg px-3 py-2 text-sm hover:bg-[var(--secondary)]"
-              onClick={() => setMobileOpen(false)}
+        <AnimatePresence>
+          {mobileOpen && user && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-[var(--border)]/50 md:hidden"
             >
-              Dashboard
-            </Link>
-            <div className="mt-2 px-3 py-2 text-sm text-[var(--muted)]">
-              {user.name} ({user.role})
-            </div>
-            <button
-              onClick={handleLogout}
-              className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--danger)] hover:bg-[var(--secondary)]"
-            >
-              <LogOut className="h-4 w-4" /> Log Out
-            </button>
-          </div>
-        )}
+              <div className="pb-4 pt-3 space-y-1">
+                <Link
+                  href={dashboardLink}
+                  className="block rounded-xl px-4 py-2.5 text-sm font-medium hover:bg-[var(--secondary)]/80 transition-all duration-150"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <div className="mt-2 mx-3 flex items-center gap-2.5 rounded-xl bg-[var(--secondary)]/60 border border-[var(--border)]/30 px-3.5 py-2.5">
+                  <User className="h-4 w-4 text-[var(--foreground)]/60" />
+                  <span className="text-sm font-medium">{user.name}</span>
+                  <span className="rounded-md bg-gradient-to-r from-[var(--primary)] to-[var(--primary)]/80 px-2.5 py-0.5 text-xs font-semibold text-white">
+                    {user.role}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger)]/10 transition-all duration-150"
+                >
+                  <LogOut className="h-4 w-4" /> Log Out
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );

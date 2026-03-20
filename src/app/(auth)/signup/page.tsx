@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Activity, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -48,108 +49,231 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Activity className="h-8 w-8 text-[var(--primary)]" />
-            <span className="text-2xl font-bold">BloodWork Pro</span>
-          </Link>
-          <p className="mt-2 text-[var(--muted)]">Create your account</p>
-        </div>
+    <div
+      className="relative flex min-h-screen items-center justify-center overflow-hidden px-4"
+      style={{ background: "var(--background)" }}
+    >
+      {/* Floating orbs */}
+      <div className="orb orb-1" />
+      <div className="orb orb-2" />
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-xl border border-[var(--border)] bg-[var(--background)] p-8 shadow-sm"
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo & Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mb-8 text-center"
         >
-          <h2 className="mb-6 text-xl font-semibold">Sign Up</h2>
+          <Link href="/" className="inline-flex items-center gap-3">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-xl"
+              style={{
+                background: "linear-gradient(135deg, var(--primary), var(--accent))",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+              }}
+            >
+              <Activity className="h-6 w-6 text-white" />
+            </div>
+            <span
+              className="text-2xl font-bold"
+              style={{ color: "var(--foreground)" }}
+            >
+              BloodWork Pro
+            </span>
+          </Link>
+          <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>
+            Create your account
+          </p>
+        </motion.div>
 
-          {error && (
-            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
-              {error}
-            </div>
-          )}
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+        >
+          <form
+            onSubmit={handleSubmit}
+            className="glass-card relative overflow-hidden rounded-2xl p-8"
+          >
+            {/* Gradient accent line */}
+            <div
+              className="absolute left-0 right-0 top-0 h-[2px]"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent), var(--accent-2))",
+              }}
+            />
 
-          <div className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition"
-                placeholder="Dr. Jane Smith"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition"
-                placeholder="Min 8 characters"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium">I am a...</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole("PATIENT")}
-                  className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
-                    role === "PATIENT"
-                      ? "border-[var(--primary)] bg-blue-50 text-[var(--primary)] dark:bg-blue-950"
-                      : "border-[var(--border)] hover:bg-[var(--secondary)]"
-                  }`}
+            <h2
+              className="mb-6 text-xl font-semibold"
+              style={{ color: "var(--foreground)" }}
+            >
+              Sign Up
+            </h2>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="glass-card mb-4 rounded-xl border p-3 text-sm"
+                style={{
+                  borderColor: "rgba(239,68,68,0.3)",
+                  background: "rgba(239,68,68,0.08)",
+                  color: "#f87171",
+                }}
+              >
+                {error}
+              </motion.div>
+            )}
+
+            <div className="space-y-5">
+              <div>
+                <label
+                  className="mb-1.5 block text-sm font-medium"
+                  style={{ color: "var(--foreground)" }}
                 >
-                  Patient
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("DOCTOR")}
-                  className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
-                    role === "DOCTOR"
-                      ? "border-[var(--primary)] bg-blue-50 text-[var(--primary)] dark:bg-blue-950"
-                      : "border-[var(--border)] hover:bg-[var(--secondary)]"
-                  }`}
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="input-glow w-full rounded-xl border px-4 py-3 text-sm outline-none transition"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--secondary)",
+                    color: "var(--foreground)",
+                  }}
+                  placeholder="Dr. Jane Smith"
+                />
+              </div>
+              <div>
+                <label
+                  className="mb-1.5 block text-sm font-medium"
+                  style={{ color: "var(--foreground)" }}
                 >
-                  Doctor
-                </button>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="input-glow w-full rounded-xl border px-4 py-3 text-sm outline-none transition"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--secondary)",
+                    color: "var(--foreground)",
+                  }}
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div>
+                <label
+                  className="mb-1.5 block text-sm font-medium"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  className="input-glow w-full rounded-xl border px-4 py-3 text-sm outline-none transition"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--secondary)",
+                    color: "var(--foreground)",
+                  }}
+                  placeholder="Min 8 characters"
+                />
+              </div>
+              <div>
+                <label
+                  className="mb-2 block text-sm font-medium"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  I am a...
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRole("PATIENT")}
+                    className="relative rounded-xl px-4 py-3.5 text-sm font-medium transition"
+                    style={{
+                      background: role === "PATIENT" ? "var(--secondary)" : "transparent",
+                      color: role === "PATIENT" ? "var(--foreground)" : "var(--muted)",
+                      border: role === "PATIENT" ? "none" : "1px solid var(--border)",
+                      ...(role === "PATIENT"
+                        ? {
+                            backgroundClip: "padding-box",
+                            boxShadow: "inset 0 0 0 1.5px transparent",
+                            outline: "2px solid transparent",
+                            backgroundImage: `linear-gradient(var(--secondary), var(--secondary)), linear-gradient(135deg, var(--primary), var(--accent))`,
+                            backgroundOrigin: "border-box",
+                            backgroundClip: "padding-box, border-box",
+                            border: "2px solid transparent",
+                          }
+                        : {}),
+                    }}
+                  >
+                    Patient
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole("DOCTOR")}
+                    className="relative rounded-xl px-4 py-3.5 text-sm font-medium transition"
+                    style={{
+                      background: role === "DOCTOR" ? "var(--secondary)" : "transparent",
+                      color: role === "DOCTOR" ? "var(--foreground)" : "var(--muted)",
+                      border: role === "DOCTOR" ? "none" : "1px solid var(--border)",
+                      ...(role === "DOCTOR"
+                        ? {
+                            backgroundClip: "padding-box",
+                            boxShadow: "inset 0 0 0 1.5px transparent",
+                            outline: "2px solid transparent",
+                            backgroundImage: `linear-gradient(var(--secondary), var(--secondary)), linear-gradient(135deg, var(--primary), var(--accent))`,
+                            backgroundOrigin: "border-box",
+                            backgroundClip: "padding-box, border-box",
+                            border: "2px solid transparent",
+                          }
+                        : {}),
+                    }}
+                  >
+                    Doctor
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-hover)] disabled:opacity-50 transition"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Create Account
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="gradient-btn mt-7 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-50"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              Create Account
+            </button>
 
-          <p className="mt-4 text-center text-sm text-[var(--muted)]">
-            Already have an account?{" "}
-            <Link href="/login" className="text-[var(--primary)] hover:underline">
-              Log in
-            </Link>
-          </p>
-        </form>
+            <p
+              className="mt-5 text-center text-sm"
+              style={{ color: "var(--muted)" }}
+            >
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="font-medium transition hover:underline"
+                style={{ color: "var(--primary)" }}
+              >
+                Log in
+              </Link>
+            </p>
+          </form>
+        </motion.div>
       </div>
     </div>
   );
